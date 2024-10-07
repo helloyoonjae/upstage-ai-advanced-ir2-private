@@ -609,8 +609,7 @@ test_query = "예외 처리가 필요한 경우"
     
 # 아래부터는 실제 RAG를 구현하는 코드입니다.
 # OpenAI API 키를 환경변수에 설정
-#export OPENAI_API_KEY="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"
-
+#export OPENAI_API_KEY=
 # from openai import OpenAI
 # import traceback
 
