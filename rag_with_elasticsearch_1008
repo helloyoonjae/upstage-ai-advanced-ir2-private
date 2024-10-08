@@ -559,33 +559,33 @@ mappings = {
 
 
 
-# # settings, mappings 설정된 내용으로 'test' 인덱스 생성
-# create_es_index("test", settings, mappings)
+# settings, mappings 설정된 내용으로 'test' 인덱스 생성
+create_es_index("test", settings, mappings)
 
-# # 문서의 content 필드에 대한 임베딩 생성
-# index_docs = []
-# # with open("../data/documents.jsonl") as f:
-# with open("/data/ephemeral/home/data/documents.jsonl") as f:
-#     docs = [json.loads(line) for line in f]
-# embeddings = get_embeddings_in_batches(docs)
+# 문서의 content 필드에 대한 임베딩 생성
+index_docs = []
+# with open("../data/documents.jsonl") as f:
+with open("/data/ephemeral/home/data/documents.jsonl") as f:
+    docs = [json.loads(line) for line in f]
+embeddings = get_embeddings_in_batches(docs)
                 
-# # 생성한 임베딩을 색인할 필드로 추가
-# for doc, embedding in zip(docs, embeddings):
-#     doc["embeddings"] = embedding.tolist()
-#     index_docs.append(doc)
+# 생성한 임베딩을 색인할 필드로 추가
+for doc, embedding in zip(docs, embeddings):
+    doc["embeddings"] = embedding.tolist()
+    index_docs.append(doc)
 
-# # 'test' 인덱스에 대량 문서 추가
-# ret = bulk_add("test", index_docs)
+# 'test' 인덱스에 대량 문서 추가
+ret = bulk_add("test", index_docs)
 
-# # 색인이 잘 되었는지 확인 (색인된 총 문서수가 출력되어야 함)
-# print('색인된 총 문서: ',len(ret),'\n\n\n')
+# 색인이 잘 되었는지 확인 (색인된 총 문서수가 출력되어야 함)
+print('색인된 총 문서: ',len(ret),'\n\n\n')
 
 # #test_query = "금성이 다른 행성들보다 밝게 보이는 이유는 무엇인가요?"
 # #test_query = "개기일식, 개기월식의 차이는?"
 # #test_query = "반도체란?"
 # #test_query = "철이 녹이 스는 건 왜 그런거야?"
 # #test_query = "철이 녹는 이유"
-test_query = "예외 처리가 필요한 경우"
+# test_query = "예외 처리가 필요한 경우"
 #test_query = "연구자가 가져야 할 태도와 자세"
 
 
@@ -609,14 +609,15 @@ test_query = "예외 처리가 필요한 경우"
     
 # 아래부터는 실제 RAG를 구현하는 코드입니다.
 # OpenAI API 키를 환경변수에 설정
-#export OPENAI_API_KEY=
+# export OPENAI_API_KEY="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"
+
 # from openai import OpenAI
 # import traceback
 
 # client = OpenAI()
 # # 사용할 모델을 설정(여기서는 gpt-3.5-turbo-1106 모델 사용)
-# llm_model = "gpt-3.5-turbo-1106"
-
+# #llm_model = "gpt-3.5-turbo-1106"
+# llm_model = "gpt-4o-mini-2024-07-18"
 
 # #RAG 구현에 필요한 Question Answering을 위한 LLM  프롬프트
 # persona_qa = """
@@ -745,12 +746,11 @@ test_query = "예외 처리가 필요한 경우"
 # """
 
 # persona_function_calling = """ 
-# ## 역할: 과학 상식 전문가
-# ## 지시사항:
-# 반드시 사용자가 과학과 관련된 질문을 할 경우에만, standalone_query를 생성하기 위해 반드시 search tool을 호출하십시오. 
-# 이때 standalone_query는 반드시 사용자의 질문에 사용된 단어를 모두 포함해야하고, 질문에 관련된 동의어 및 정답 키워드를 질문 뒤에 추가하여 검색 범위를 확장해야 합니다.
-# 최종 standalone_query는 반드시 한국어로 작성하여야 합니다.
-# 사용자가 일상 대화를 할 경우, search tool을 호출하지 말고 대화 맥락에 맞춰 자연스럽게 답변하십시오.
+# 역할: 사용자의 질문에 관련된 단어를 추가하여 검색어로 변경 후 search tool 호출
+# 지시사항: 사용자가 정보를 요청할 경우 standalone_query를 생성하기 위해 반드시 search tool을 호출하십시오.
+# standalone_query는 반드시 사용자의 질문에 사용된 단어를 모두 포함해야 하며, 
+# 질문에 사용된 단어들과 관련된 단어를 도출할 수 있는 경우 5개 이하로 추가하여 검색 범위를 확장해야 합니다.
+# 사용자가 '너 뭘 잘해?' 와 같은 일상적인 대화를 할 경우, search tool을 호출하지 말고 대화 맥락에 맞춰 자연스럽게 답변하십시오.
 # """
 
 # # Function calling에 사용할 함수 정의
@@ -842,7 +842,7 @@ test_query = "예외 처리가 필요한 경우"
 #             idx += 1
 
 # # 평가 데이터에 대해서 결과 생성 - 파일 포맷은 jsonl이지만 파일명은 csv 사용
-# eval_rag("/data/ephemeral/home/data/eval.jsonl", "sample_submission6_roberta_sparse_fullprompt.csv", )
+# eval_rag("/data/ephemeral/home/data/eval.jsonl", "sample_submission9_roberta_hybrid_4omini.csv", )
 
 
 
@@ -882,7 +882,7 @@ def rescore_existing_results(input_filename, output_filename):
 
                 #search_result = sparse_retrieve(standalone_query, 3) # MUST # match_phrase
                
-                search_result = hybrid_retrieve(standalone_query, 3)
+                search_result = dense_retrieve(standalone_query, 3)
                 
                 response = {"eval_id": row.get("eval_id"), "standalone_query": standalone_query, "topk": [], "references": []}
                 for rst in search_result['hits']['hits']:
@@ -903,6 +903,7 @@ def rescore_existing_results(input_filename, output_filename):
         
         
 # 기존 CSV 파일을 사용하여 재검색 결과 생성
-rescore_existing_results("/data/ephemeral/home/sample_submission6_roberta_sparse_fullprompt.csv", "/data/ephemeral/home/sample_submission8_roberta_hybrid_synonyms.csv")
+#rescore_existing_results("/data/ephemeral/home/sample_submission6_roberta_sparse_fullprompt.csv", "/data/ephemeral/home/sample_submission8_roberta_hybrid_synonyms.csv")
+rescore_existing_results("/data/ephemeral/home/sample_submission9_roberta_hybrid_4omini.csv", "/data/ephemeral/home/sample_submission9_roberta_dense_4omini.csv")
 
 
