@@ -1,0 +1,6 @@
+OPENAI_API_KEY.env
+data/
+lotte.tar.gz
+lotte/
+rag_base_dence_retrieve.ipynb
+rag_base_sparseretrieve.ipynb
