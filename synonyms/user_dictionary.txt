@@ -1,87 +1,108 @@
-오토마톤
-NMR
-Elodea
-AIDS
-마이애미파랑나비
-헤르페스
-광자
-아메리카 알리게이터
-Nmap
-웹 프록시
-알파 붕괴
-찰스 다윈
-니크롬선
-후마네 비떼
-MSM
-트레드밀
-ALU
-CPU
-어큐뮬레이터
-SCR
-인덕터
-크레아틴
-캐비티
-ADP
-Ca
-사스
-알짜이온
-C6H14
-OpenSSL
-mountain chorus frog
-베이츠 의태
-AM
-FM
-유미지립
-HDL
-ATP
-Elaphe obsoleta
-쥐 뱀
-GDP
-DNMT1
-튀르키 예인
-NonNicks
-SCR
-알캅톤뇨증
-백색증
-후를러 증후군
-관상 봉합
-한수교
-멤브레인
-핵종
-파울리의 배타 원리
-인스턴트 메시징 애플리케이션
-호이겐스의 원리
-윈 브리지 발진기
-키메라증
-역 U 가설
-PRP
-연기 열수공
-머클-담고르 해시 함수
-스칸듐 이온
-RQ
-The respiration quotien
-The Atherogenic Lipoprotein Phenotype
-ALP
-MERS
-오르니틴 트랜스카비미라제
-OTC
-GAL
-Generic Array Logic
-디메틸니트록시드
-(CH3)2NO
-시클로부틸 라디칼
-C4H7
-ADL
-일상 생활 활동
-DNA
-RNA
-mRNA
-MERS
-tRNA
-CO2
-NGS
-O_{2}
-O2
-DNMT1
-WHO
-
+오토마톤,NNP
+NMR,NNP
+Elodea,NNP
+AIDS,NNP
+마이애미파랑나비,NNP
+헤르페스,NNP
+광자,NNP
+아메리카알리게이터,NNP
+Nmap,NNP
+웹프록시,NNP
+웹 프록시,NNP
+알파붕괴,NNP
+알파 붕괴,NNP
+찰스다윈,NNP
+찰스 다윈,NNP
+니크롬선,NNP
+후마네비떼,NNP
+후마네 비떼,NNP
+MSM,NNP
+트레드밀,NNP
+ALU,NNP
+CPU,NNP
+어큐뮬레이터,NNP
+SCR,NNP
+인덕터,NNP
+크레아틴,NNP
+캐비티,NNP
+ADP,NNP
+Ca,NNP
+사스,NNP
+알짜이온,NNP
+C6H14,NNP
+OpenSSL,NNP
+mountainchorusfrog,NNP
+mountain chorus frog,NNP
+베이츠의태,NNP
+베이츠 의태,NNP
+AM,NNP
+FM,NNP
+유미지립,NNP
+HDL,NNP
+ATP,NNP
+Elapheobsoleta,NNP
+Elaphe obsoleta,NNP
+쥐뱀,NNP
+쥐 뱀,NNP
+GDP,NNP
+DNMT1,NNP
+DNA 메틸트랜스퍼라제, NNP
+메틸트랜스퍼라제, NNP
+튀르키예인,NNP
+튀르키 예인,NNP
+NonNicks,NNP
+알캅톤뇨증,NNP
+백색증,NNP
+후를러증후군,NNP
+후를러 증후군,NNP
+관상봉합,NNP
+관상 봉합,NNP
+한수교,NNP
+멤브레인,NNP
+핵종,NNP
+파올리의배타원리,NNP
+파울리의 배타 원리,NNP
+인스턴트메시징애플리케이션,NNP
+인스턴트 메시징 애플리케이션,NNP
+호이겐스의원리,NNP
+호이겐스의 원리,NNP
+원브리지발진기,NNP
+윈 브리지 발진기,NNP
+키메라증,NNP
+역U가설,NNP
+역 U 가설,NNP
+PRP,NNP
+연기열수공,NNP
+연기 열수공,NNP
+머클-담고르해시함수,NNP
+머클-담고르 해시 함수,NNP
+스칸듐이온,NNP
+스칸듐 이온,NNP
+RQ,NNP
+The respiration quotient,NNP
+The Atherogenic Lipoprotein Phenotype,NNP
+ALP,NNP
+MERS,NNP
+오르니틴트랜스카비미라제,NNP
+오르니틴 트랜스카비미라제,NNP
+OTC,NNP
+GAL,NNP
+Generic Array Logic,NNP
+디메틸니트록시드,NNP
+(CH3)2NO,NNP
+시클로부틸라디칼,NNP
+시클로부틸 라디칼,NNP
+C4H7,NNP
+ADL,NNP
+일상생활활동,NNP
+일상 생활 활동,NNP
+DNA,NNP
+RNA,NNP
+mRNA,NNP
+tRNA,NNP
+CO2,NNP
+NGS,NNP
+O2,NNP
+디엔에이리가아제,NNP
+디엔에이 리가아제,NNP
+WHO,NNP
