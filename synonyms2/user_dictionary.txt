@@ -1,0 +1,118 @@
+오토마톤,NNG
+NMR,NNP
+Elodea,NNP
+AIDS,NNP
+마이애미파랑나비,NNP
+헤르페스,NNG
+광자,NNG
+아메리카알리게이터,NNP
+Nmap,NNP
+웹프록시,NNG
+웹 프록시,NNG
+알파붕괴,NNG
+알파 붕괴,NNG
+찰스다윈,NNP
+찰스 다윈,NNP
+니크롬선,NNG
+후마네비떼,NNP
+후마네 비떼,NNP
+MSM,NNP
+트레드밀,NNG
+ALU,NNP
+CPU,NNP
+어큐뮬레이터,NNG
+SCR,NNP
+인덕터,NNG
+크레아틴,NNG
+캐비티,NNG
+ADP,NNP
+Ca,NNP
+사스,NNP
+알짜이온,NNG
+C6H14,NNP
+OpenSSL,NNP
+mountainchorusfrog,NNP
+mountain chorus frog,NNP
+베이츠의태,NNP
+베이츠 의태,NNP
+AM,NNP
+FM,NNP
+유미지립,NNG
+HDL,NNP
+ATP,NNP
+Elapheobsoleta,NNP
+Elaphe obsoleta,NNP
+쥐뱀,NNP
+쥐 뱀,NNP
+GDP,NNP
+DNMT1,NNP
+DNA 메틸트랜스퍼라제,NNP
+메틸트랜스퍼라제,NNG
+튀르키예인,NNP
+튀르키 예인,NNP
+NonNicks,NNP
+알캅톤뇨증,NNG
+백색증,NNG
+후를러증후군,NNP
+후를러 증후군,NNP
+관상봉합,NNG
+관상 봉합,NNG
+한수교,NNP
+멤브레인,NNG
+핵종,NNG
+파울리의배타원리,NNP
+파울리의 배타 원리,NNP
+인스턴트메시징애플리케이션,NNG
+인스턴트 메시징 애플리케이션,NNG
+호이겐스의원리,NNP
+호이겐스의 원리,NNP
+원브리지발진기,NNP
+윈 브리지 발진기,NNP
+키메라증,NNG
+역U가설,NNP
+역 U 가설,NNP
+PRP,NNP
+연기열수공,NNG
+연기 열수공,NNG
+머클-담고르해시함수,NNP
+머클-담고르 해시 함수,NNP
+스칸듐이온,NNG
+스칸듐 이온,NNG
+RQ,NNP
+The respiration quotient,NNP
+The Atherogenic Lipoprotein Phenotype,NNP
+ALP,NNP
+MERS,NNP
+오르니틴 트랜스카비미라제,NNP
+오르니틴트랜스카비미라제,NNP
+오르니틴트랜스카바밀레이스,NNP
+오르니틴 트랜스카바밀레이스,NNP
+OTC,NNP
+GAL,NNP
+Generic Array Logic,NNP
+디메틸니트록시드,NNP
+(CH3)2NO,NNP
+시클로부틸라디칼,NNP
+시클로부틸 라디칼,NNP
+C4H7,NNP
+ADL,NNP
+일상생활활동,NNG
+일상 생활 활동,NNG
+DNA,NNP
+RNA,NNP
+mRNA,NNP
+tRNA,NNP
+CO2,NNP
+NGS,NNP
+O2,NNP
+디엔에이리가아제,NNP
+디엔에이 리가아제,NNP
+WHO,NNP
+심해,NNG
+해저,NNG
+담수,NNG
+염수,NNG
+파리,NNG
+벽돌공,NNP
+짚신벌레,NNG
+짚신 벌레,NNG
