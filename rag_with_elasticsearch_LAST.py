@@ -155,44 +155,60 @@ def dense_retrieve(query_str, size, sparsedocids=None):
     #     "k": size,
     #     "num_candidates": 200
     # }
-
-
-    # sparsedocids가 있을 경우 해당 문서들로 제한하여 검색
-    print("sparsedocids: ", sparsedocids)
-    if sparsedocids:
-        knn_query = {
-            "script_score": { # 각 문서의 유사도를 점수로 매깁니다
-                "query": {
-                    "ids": {  # 'ids' 쿼리를 사용하여 특정 문서 ID 집합을 대상으로 설정
-                        "values": sparsedocids
-                    }
-                },
-                "script": {
-                    "source": "cosineSimilarity(params.query_vector, 'embeddings') + 1.0",
-                    "params": {
-                        "query_vector": query_embedding.tolist()
-                    }
+    
+    knn_query = {
+        "script_score": { # 각 문서의 유사도를 점수로 매깁니다
+            "query": {
+                "match_all": {} # 모든 문서 검색
+            },
+            "script": {
+                "source": "1 / (1 + l2norm(params.query_vector, 'embeddings'))",
+                "params": {
+                    "query_vector": query_embedding.tolist()
                 }
             }
         }
-    else:
-        # KNN을 사용한 벡터 유사성 검색을 위한 매개변수 설정
-        knn_query = {
-            "script_score": { # 각 문서의 유사도를 점수로 매깁니다
-                "query": {
-                    "match_all": {} # 모든 문서 검색
-                },
-                "script": {
-                    "source": "cosineSimilarity(params.query_vector, 'embeddings') + 1.0",
-                    "params": {
-                        "query_vector": query_embedding.tolist()
-                    }
-                }
-            }
-        }        
+    }        
 
     # 지정된 인덱스에서 벡터 유사도 검색 수행
+    # return es.search(index="test", knn=knn_query, size=size)
     return es.search(index="test", query=knn_query, size=size)
+
+    # # sparsedocids가 있을 경우 해당 문서들로 제한하여 검색
+    # print("sparsedocids: ", sparsedocids)
+    # if sparsedocids:
+    #     knn_query = {
+    #         "script_score": { # 각 문서의 유사도를 점수로 매깁니다
+    #             "query": {
+    #                 "ids": {  # 'ids' 쿼리를 사용하여 특정 문서 ID 집합을 대상으로 설정
+    #                     "values": sparsedocids
+    #                 }
+    #             },
+    #             "script": {
+    #                 "source": "cosineSimilarity(params.query_vector, 'embeddings') + 1.0",
+    #                 "params": {
+    #                     "query_vector": query_embedding.tolist()
+    #                 }
+    #             }
+    #         }
+    #     }
+    # else:
+    #     # KNN을 사용한 벡터 유사성 검색을 위한 매개변수 설정
+    #     knn_query = {
+    #         "script_score": { # 각 문서의 유사도를 점수로 매깁니다
+    #             "query": {
+    #                 "match_all": {} # 모든 문서 검색
+    #             },
+    #             "script": {
+    #                 "source": "cosineSimilarity(params.query_vector, 'embeddings') + 1.0",
+    #                 "params": {
+    #                     "query_vector": query_embedding.tolist()
+    #                 }
+    #             }
+    #         }
+    #     }        
+
+    
 
 
 
@@ -536,7 +552,7 @@ mappings = {
         "embeddings": {
             "type": "dense_vector",
             #"dims": 384,
-            "dims": 768,
+            "dims": len(embeddings[0]),
             "index": True,
             "similarity": "l2_norm"
         }
@@ -841,78 +857,167 @@ print('색인된 총 문서: ',len(ret),'\n\n\n')
 import pandas as pd
 import traceback
 
+# 아래부터는 실제 RAG를 구현하는 코드입니다.
+# OpenAI API 키를 환경변수에 설정
+# export OPENAI_API_KEY="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"
 
-# # 기존 CSV 파일을 사용하여 재검색 수행
+from openai import OpenAI
+import traceback
+
+client = OpenAI()
+# 사용할 모델을 설정(여기서는 gpt-3.5-turbo-1106 모델 사용)
+#llm_model = "gpt-3.5-turbo-1106"
+llm_model = "gpt-4o"
+
+
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import heapq
+import torch
+from elasticsearch import Elasticsearch, helpers
+from openai import OpenAI
+from tqdm import tqdm
+import numpy as np
+
+reranker_tokenizer = AutoTokenizer.from_pretrained("Dongjin-kr/ko-reranker")
+reranker_model = AutoModelForSequenceClassification.from_pretrained("Dongjin-kr/ko-reranker")
+
+# exp_normalize function
+def exp_normalize(x):
+    b = x.max()
+    y = np.exp(x - b)
+    return y / y.sum()
+
+# rescore_existing_results function
 def rescore_existing_results(input_filename, output_filename):
     try:
-        # CSV 파일에서 데이터 읽기
+        # Read data from the input JSONL file
         test_query = pd.read_json(input_filename, lines=True)
+        print(f"Loaded {len(test_query)} queries from input file.")
         
-        # 검색 결과를 저장할 리스트 초기화
+        # Initialize a list to store the updated search results
         updated_results = []
 
-       # 각 row의 standalone_query 컬럼에 대해 검색 수행
-        for idx, row in test_query.iterrows():
+        # Process each query in the dataframe
+        for idx, row in tqdm(test_query.iterrows(), total=len(test_query), desc="Processing queries"):
             standalone_query = row.get('standalone_query')
 
             if pd.notna(standalone_query) and isinstance(standalone_query, str) and len(standalone_query.strip()) > 0:
-                # sparse_search_result = sparse_retrieve(standalone_query, 20)
-                # sparsedocids = [doc['_id'] for doc in sparse_search_result['hits']['hits']]
-                # search_result = dense_retrieve(standalone_query, 3, sparsedocids)
+                # 1-1 two way combined
+                # Perform the hybrid retrieval (example function call)
+                # search_result_hybrid = hybrid_retrieve(standalone_query, 100)
+                # search_result_dense = dense_retrieve(standalone_query, 100)
+                # print(f"Retrieved {len(search_result_hybrid['hits']['hits'])} documents for query '{standalone_query}'.")
+                # print(f"Retrieved {len(search_result_dense['hits']['hits'])} documents for query '{standalone_query}'.")
                 
-                # sparse_search_result = sparse_retrieve(standalone_query, 3)
-                # sparsedocids = [doc['_id'] for doc in sparse_search_result['hits']['hits']]
-                # dense_search_result = dense_retrieve(standalone_query, 3)
-                # denseedocids = [doc['_id'] for doc in dense_search_result['hits']['hits']]
-                # overlapping_docids = set(sparsedocids).intersection(set(denseedocids))
-                # if len(overlapping_docids) >= 1:
-                #     search_result = sparse_search_result
-                # else:
-                #     search_result = dense_search_result
+                # # Combine hybrid and dense results
+                # combined_hits = search_result_hybrid['hits']['hits'] + search_result_dense['hits']['hits']
+                # # 중복된 docid 제거
+                # unique_docs = {hit["_source"]["docid"]: hit for hit in combined_hits}.values()
+                # print(f"Retrieved {len(unique_docs)} documents for query '{standalone_query}'.")
+                
+                # # Store the top results along with their references
+                # docs = [
+                #     {"docid": hit.get("_source").get("docid"), "content": hit.get("_source").get("content")}
+                #     for hit in combined_hits
+                # ]
+                
+                # 1-1 one way 
+                search_result = hybrid_retrieve(standalone_query, 50)
+                docs = [
+                    {"docid": hit.get("_source").get("docid"), "content": hit.get("_source").get("content")}
+                    for hit in search_result['hits']['hits']
+                ]
+                
+                
+                # 2-1 Re-ranking
+                rerank_start_time = time.time()
+                pairs = [[standalone_query, doc['content']] for doc in docs]
+                reranker_model.eval()
 
-                #search_result = sparse_retrieve(standalone_query, 3) # MUST # match_phrase
-               
-                #search_result = dense_retrieve(standalone_query, 3)
-                
-                # 첫 번째 하이브리드 검색 수행 (20개의 결과)
-                # initial_search_result = hybrid_retrieve(standalone_query, 20)
-                # sparsedocids = [doc['_id'] for doc in initial_search_result['hits']['hits']]
-                
-                # # 첫 번째 검색에서 얻은 문서 ID로 두 번째 검색 수행 (3개의 결과)
-                # search_result = hybrid_docid_retrieve(standalone_query, 3, sparsedocids=sparsedocids)
+                with torch.no_grad():
+                    inputs = reranker_tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=512).to('cuda')
+                    reranker_model.to('cuda')
+                    scores = reranker_model(**inputs, return_dict=True).logits.view(-1).float()
+                    scores = exp_normalize(scores.cpu().numpy())
+                    indices = [(-score, idx) for idx, score in enumerate(scores)]
+                    heapq.heapify(indices)
+                    
+                rerank_end_time = time.time()
+                print(f"Re-ranking took {rerank_end_time - rerank_start_time:.2f} seconds.")    
 
-                search_result = hybrid_retrieve(standalone_query, 10)
-                # doc_id_to_find = "c8fd4323-9af9-4a0d-ab53-e563c71f9795"  # 찾고자 하는 docid
-                # for hit in search_result['hits']['hits']:
-                #     if hit['_id'] == str(doc_id_to_find):
-                #         if '_explanation' in hit:
-                #             print(json.dumps(hit['_explanation'], indent=4))
-                #         else:
-                #             print(f"No explanation found for docid {doc_id_to_find}")
-                #         break
-
+                # Select top 3 results
+                topk = []
+                references = []
+                for _ in range(min(10, len(indices))):
+                    score, idx = heapq.heappop(indices)
+                    docid = docs[idx]["docid"]
+                    reference = {"score": float(-score), "content": docs[idx]['content']}
+                    topk.append(docid)
+                    references.append(reference)
                 
-                response = {"eval_id": row.get("eval_id"), "standalone_query": standalone_query, "topk": [], "references": []}
-                for rst in search_result['hits']['hits']:
-                    response["topk"].append(rst.get("_source").get("docid"))
-                    response["references"].append({"score": rst.get("_score"), "content": rst.get("_source").get("content")})
+                # Update response with re-ranked results
+                response = {
+                    "eval_id": row.get("eval_id"),
+                    "standalone_query": standalone_query,
+                    "topk": topk,
+                    "references": references
+                }
                 updated_results.append(response)
+                
+                
+
+                # 3-1 LLM call for further rescoring of results
+                msg = []
+                for i in range(len(response.get("topk"))):
+                    topk_docid = response.get("topk")[i]
+                    topk_content = response.get("references")[i].get("content")
+
+                    msg = [{"role": "user", "content": f"{topk_content} 위 지문이 {response['standalone_query']} 위 질문에 알맞는 내용이면 True, 알맞지 않으면 False라고 답해줘."}]
+                                        
+                    print(f"LLM 호출을 위해 메시지 생성: {msg}")
+
+                    try:
+                        qaresult = client.chat.completions.create(
+                            model=llm_model,
+                            messages=msg,
+                            temperature=0,
+                            seed=1,
+                            timeout=30
+                        )
+                        print(f"LLM 응답: {qaresult.choices[0].message.content}")
+                    except Exception as e:
+                        traceback.print_exc()
+                        continue  # 현재 문서가 실패해도 다음 문서로 계속 진행
+
+                    # LLM의 응답이 True인 경우 response 업데이트하고 루프 탈출
+                    if qaresult.choices[0].message.content.strip().lower() == "true":
+                        response["topk"] = [topk_docid]
+                        print(f"LLM에서 True 응답을 받았으므로 문서 ID '{topk_docid}'를 선택합니다.")
+                        break
+
+                updated_results.append(response)
+
             else:
+                # If query is not valid, append an empty result
                 response = {"eval_id": row.get("eval_id"), "standalone_query": standalone_query, "topk": [], "references": []}
+                print(f"유효하지 않은 쿼리이므로 빈 결과를 추가합니다: {response}")
                 updated_results.append(response)
+
+                    
+                
                 
         # 결과를 새로운 JSONL 파일로 저장
         with open(output_filename, "w") as of:
             for result in updated_results:
                 of.write(f'{json.dumps(result, ensure_ascii=False)}\n')
-
+        print(f"모든 결과를 '{output_filename}' 파일에 저장했습니다.")
     except Exception as e:
         traceback.print_exc()
         
         
 # 기존 CSV 파일을 사용하여 재검색 결과 생성 
 # MAP Score: 0.7517676767676765 MAP Score: 0.7880880230880226
-rescore_existing_results("/data/ephemeral/home/sample_submission6_roberta_sparse_fullprompt.csv", "/data/ephemeral/home/sample_submission13_roberta_hybriddocid_synonyms.csv")
+rescore_existing_results("/data/ephemeral/home/sample_submission6_roberta_sparse_fullprompt.csv", "/data/ephemeral/home/sample_submission14_roberta_hybridmodified_synonyms_reranking.csv")
 # MAP Score: 0.667929292929293 hybrid
 # rescore_existing_results("/data/ephemeral/home/sample_submission5_roberta_re-search.csv", "/data/ephemeral/home/sample_submission13_roberta_hybriddocid_synonyms.csv")
 # MAP Score: 0.5598484848484854 sparse should
