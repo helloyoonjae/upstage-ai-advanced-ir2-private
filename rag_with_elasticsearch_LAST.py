@@ -948,7 +948,7 @@ def rescore_existing_results(input_filename, output_filename):
                 # Select top 3 results
                 topk = []
                 references = []
-                for _ in range(min(10, len(indices))):
+                for _ in range(min(3, len(indices))):
                     score, idx = heapq.heappop(indices)
                     docid = docs[idx]["docid"]
                     reference = {"score": float(-score), "content": docs[idx]['content']}
@@ -967,35 +967,35 @@ def rescore_existing_results(input_filename, output_filename):
                 
 
                 # 3-1 LLM call for further rescoring of results
-                msg = []
-                for i in range(len(response.get("topk"))):
-                    topk_docid = response.get("topk")[i]
-                    topk_content = response.get("references")[i].get("content")
+                # msg = []
+                # for i in range(len(response.get("topk"))):
+                #     topk_docid = response.get("topk")[i]
+                #     topk_content = response.get("references")[i].get("content")
 
-                    msg = [{"role": "user", "content": f"{topk_content} 위 지문이 {response['standalone_query']} 위 질문에 알맞는 내용이면 True, 알맞지 않으면 False라고 답해줘."}]
+                #     msg = [{"role": "user", "content": f"{topk_content} 위 지문이 {response['standalone_query']} 위 질문에 알맞는 내용이면 True, 알맞지 않으면 False라고 답해줘."}]
                                         
-                    print(f"LLM 호출을 위해 메시지 생성: {msg}")
+                #     print(f"LLM 호출을 위해 메시지 생성: {msg}")
 
-                    try:
-                        qaresult = client.chat.completions.create(
-                            model=llm_model,
-                            messages=msg,
-                            temperature=0,
-                            seed=1,
-                            timeout=30
-                        )
-                        print(f"LLM 응답: {qaresult.choices[0].message.content}")
-                    except Exception as e:
-                        traceback.print_exc()
-                        continue  # 현재 문서가 실패해도 다음 문서로 계속 진행
+                #     try:
+                #         qaresult = client.chat.completions.create(
+                #             model=llm_model,
+                #             messages=msg,
+                #             temperature=0,
+                #             seed=1,
+                #             timeout=30
+                #         )
+                #         print(f"LLM 응답: {qaresult.choices[0].message.content}")
+                #     except Exception as e:
+                #         traceback.print_exc()
+                #         continue  # 현재 문서가 실패해도 다음 문서로 계속 진행
 
-                    # LLM의 응답이 True인 경우 response 업데이트하고 루프 탈출
-                    if qaresult.choices[0].message.content.strip().lower() == "true":
-                        response["topk"] = [topk_docid]
-                        print(f"LLM에서 True 응답을 받았으므로 문서 ID '{topk_docid}'를 선택합니다.")
-                        break
+                #     # LLM의 응답이 True인 경우 response 업데이트하고 루프 탈출
+                #     if qaresult.choices[0].message.content.strip().lower() == "true":
+                #         response["topk"] = [topk_docid]
+                #         print(f"LLM에서 True 응답을 받았으므로 문서 ID '{topk_docid}'를 선택합니다.")
+                #         break
 
-                updated_results.append(response)
+                # updated_results.append(response)
 
             else:
                 # If query is not valid, append an empty result
@@ -1016,8 +1016,10 @@ def rescore_existing_results(input_filename, output_filename):
         
         
 # 기존 CSV 파일을 사용하여 재검색 결과 생성 
+
+rescore_existing_results('/data/ephemeral/home/data/highscore.csv', "/data/ephemeral/home/sample_submission14_roberta_hybridmodified_synonyms_reranking_jimiprompt.csv")
 # MAP Score: 0.7517676767676765 MAP Score: 0.7880880230880226
-rescore_existing_results("/data/ephemeral/home/sample_submission6_roberta_sparse_fullprompt.csv", "/data/ephemeral/home/sample_submission14_roberta_hybridmodified_synonyms_reranking.csv")
+#rescore_existing_results("/data/ephemeral/home/sample_submission6_roberta_sparse_fullprompt.csv", "/data/ephemeral/home/sample_submission14_roberta_hybridmodified_synonyms_reranking.csv")
 # MAP Score: 0.667929292929293 hybrid
 # rescore_existing_results("/data/ephemeral/home/sample_submission5_roberta_re-search.csv", "/data/ephemeral/home/sample_submission13_roberta_hybriddocid_synonyms.csv")
 # MAP Score: 0.5598484848484854 sparse should
