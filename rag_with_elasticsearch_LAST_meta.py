@@ -4,7 +4,9 @@ from elasticsearch import Elasticsearch, helpers
 from sentence_transformers import SentenceTransformer
 
 # Sentence Transformer 모델 초기화 (한국어 임베딩 생성 가능한 어떤 모델도 가능)
-model = SentenceTransformer("jhgan/ko-sroberta-multitask")
+
+model = SentenceTransformer("snunlp/KLUE-SRoBERTa-Large-SNUExtended-klueNLI-klueSTS")
+#model = SentenceTransformer("jhgan/ko-sroberta-multitask")
 #model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 #model = SentenceTransformer("/data/ephemeral/home/code/output/training_jhgan-ko-sroberta-multitask_binary_2024-10-09_16-45-53-epoch-1")
 #model = SentenceTransformer("/data/ephemeral/home/code/sroberta_finetuned_epoch_1")
@@ -151,30 +153,30 @@ def dense_retrieve(query_str, size, sparsedocids=None):
     query_embedding = get_embedding([query_str])[0]
     #query_embedding /= np.linalg.norm(query_embedding)  # Normalize the query vector: 정답이 이상함
 
-    # # KNN을 사용한 벡터 유사성 검색을 위한 매개변수 설정
-    # knn_query = {
-    #     "field": "embeddings",
-    #     "query_vector": query_embedding.tolist(),
-    #     "k": size,
-    #     "num_candidates": 200
-    # }
-    
+    # KNN을 사용한 벡터 유사성 검색을 위한 매개변수 설정
     knn_query = {
-        "script_score": { # 각 문서의 유사도를 점수로 매깁니다
-            "query": {
-                "match_all": {} # 모든 문서 검색
-            },
-            "script": {
-                "source": "1 / (1 + l2norm(params.query_vector, 'embeddings'))",
-                "params": {
-                    "query_vector": query_embedding.tolist()
-                }
-            }
-        }
-    }        
+        "field": "embeddings",
+        "query_vector": query_embedding.tolist(),
+        "k": size,
+        "num_candidates": 200
+    }
+    
+    # knn_query = {
+    #     "script_score": { # 각 문서의 유사도를 점수로 매깁니다
+    #         "query": {
+    #             "match_all": {} # 모든 문서 검색
+    #         },
+    #         "script": {
+    #             "source": "1 / (1 + l2norm(params.query_vector, 'embeddings'))",
+    #             "params": {
+    #                 "query_vector": query_embedding.tolist()
+    #             }
+    #         }
+    #     }
+    # }        
 
     # 지정된 인덱스에서 벡터 유사도 검색 수행
-    # return es.search(index="test", knn=knn_query, size=size)
+    return es.search(index="test", knn=knn_query, size=size)
     return es.search(index="test", query=knn_query, size=size)
 
     # # sparsedocids가 있을 경우 해당 문서들로 제한하여 검색
@@ -229,7 +231,7 @@ def hybrid_retrieve(query_str, size):
                     {
                         "multi_match": {
                             "query": query_str,
-                            "fields": ["content^3", "summary^2", "keywords^5"],
+                            "fields": ["content^3", "keywords^5", "title^5"], 
                             "boost": 0.0025,
                             "fuzziness": "AUTO" # 오타나 철자가 약간 다른 단어들도 검색 결과에 포함
                         }
@@ -457,7 +459,7 @@ create_es_index("test", settings, mappings)
 # 문서의 content 필드에 대한 임베딩 생성
 index_docs = []
 # with open("../data/documents.jsonl") as f:
-with open("/data/ephemeral/home/data/documents_meta.jsonl") as f:
+with open("/data/ephemeral/home/data/documents_meta_keyword.jsonl") as f:
     docs = [json.loads(line) for line in f]
 embeddings = get_embeddings_in_batches(docs)
                 
@@ -789,25 +791,18 @@ def rescore_existing_results(input_filename, output_filename):
             if pd.notna(standalone_query) and isinstance(standalone_query, str) and len(standalone_query.strip()) > 0:
                 # 1-1 two way combined
                 # Perform the hybrid retrieval (example function call)
-                # search_result_hybrid = hybrid_retrieve(standalone_query, 100)
-                # search_result_dense = dense_retrieve(standalone_query, 100)
-                # print(f"Retrieved {len(search_result_hybrid['hits']['hits'])} documents for query '{standalone_query}'.")
-                # print(f"Retrieved {len(search_result_dense['hits']['hits'])} documents for query '{standalone_query}'.")
+                search_result_hybrid = hybrid_retrieve(standalone_query, 100)
+                search_result_dense = dense_retrieve(standalone_query, 50)
+                print(f"Retrieved {len(search_result_hybrid['hits']['hits'])} documents for query '{standalone_query}'.")
+                print(f"Retrieved {len(search_result_dense['hits']['hits'])} documents for query '{standalone_query}'.")
                 
-                # # Combine hybrid and dense results
-                # combined_hits = search_result_hybrid['hits']['hits'] + search_result_dense['hits']['hits']
-                # # 중복된 docid 제거
-                # unique_docs = {hit["_source"]["docid"]: hit for hit in combined_hits}.values()
-                # print(f"Retrieved {len(unique_docs)} documents for query '{standalone_query}'.")
+                # Combine hybrid and dense results
+                combined_hits = search_result_hybrid['hits']['hits'] + search_result_dense['hits']['hits']
+                # 중복된 docid 제거
+                unique_docs = {hit["_source"]["docid"]: hit for hit in combined_hits}.values()
+                print(f"Retrieved {len(unique_docs)} documents for query '{standalone_query}'.")
                 
-                # # Store the top results along with their references
-                # docs = [
-                #     {"docid": hit.get("_source").get("docid"), "content": hit.get("_source").get("content")}
-                #     for hit in combined_hits
-                # ]
-                
-                # 1-1 one way 
-                search_result = hybrid_retrieve(standalone_query, 150)
+                # Store the top results along with their references
                 docs = [
                     {"docid": hit.get("_source").get("docid"), 
                      "title": hit.get("_source").get("title"),
@@ -815,8 +810,20 @@ def rescore_existing_results(input_filename, output_filename):
                      "content": hit.get("_source").get("content"),
                      "summary": hit.get("_source").get("summary")
                      }
-                    for hit in search_result['hits']['hits']
+                    for hit in unique_docs
                 ]
+                
+                #1-1 one way 
+                # search_result = hybrid_retrieve(standalone_query, 100)
+                # docs = [
+                #     {"docid": hit.get("_source").get("docid"), 
+                #      "title": hit.get("_source").get("title"),
+                #      "keywords": hit.get("_source").get("keywords"),
+                #      "content": hit.get("_source").get("content"),
+                #      "summary": hit.get("_source").get("summary")
+                #      }
+                #     for hit in search_result['hits']['hits']
+                # ]
                 
                 
                 # 2-1 Re-ranking
@@ -838,7 +845,7 @@ def rescore_existing_results(input_filename, output_filename):
                 # Select top 3 results
                 topk = []
                 references = []
-                for _ in range(min(3, len(indices))):
+                for _ in range(min(5, len(indices))):
                     score, idx = heapq.heappop(indices)
                     docid = docs[idx]["docid"]
                     reference = {"score": float(-score), "content": docs[idx]['content']}
@@ -907,7 +914,7 @@ def rescore_existing_results(input_filename, output_filename):
         
 # 기존 CSV 파일을 사용하여 재검색 결과 생성 
 
-rescore_existing_results('/data/ephemeral/home/data/highscore.csv', "/data/ephemeral/home/sample_submission14_roberta_hybridmodified_synonyms_reranking_jimiprompt_documeta.csv")
+rescore_existing_results('/data/ephemeral/home/data/highscore.csv', "/data/ephemeral/home/sample_submission14_snunlpKLUE_combined_synonyms_reranking_jimiprompt_documeta100_top5.csv")
 # MAP Score: 0.7517676767676765 MAP Score: 0.7880880230880226
 #rescore_existing_results("/data/ephemeral/home/sample_submission6_roberta_sparse_fullprompt.csv", "/data/ephemeral/home/sample_submission14_roberta_hybridmodified_synonyms_reranking.csv")
 # MAP Score: 0.667929292929293 hybrid
