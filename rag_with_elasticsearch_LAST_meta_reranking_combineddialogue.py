@@ -518,46 +518,24 @@ def rescore_existing_results(input_filename, output_filename):
                 rerank_end_time = time.time()
                 print(f"Re-ranking took {rerank_end_time - rerank_start_time:.2f} seconds.")    
 
-                # Select top 20 results for further re-ranking
-                top20_docs = []
+                #Select top 5 results for further re-ranking
+                topk = []
+                references = []
                 for _ in range(min(20, len(indices))):
                     score, idx = heapq.heappop(indices)
                     docid = docs[idx]["docid"]
-                    top20_docs.append((docid, docs[idx]['content'], float(-score)))
-
-                # Second re-ranking to select top 3 results
-                second_rerank_start_time = time.time()
-                reranker_model.eval()
-
-                with torch.no_grad():
-                    pairs = [[combined_content, content] for _, content, _ in top20_docs]
-                    inputs = reranker_tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=512).to('cuda')
-                    scores = reranker_model(**inputs, return_dict=True).logits.view(-1).float()
-                    scores = exp_normalize(scores.cpu().numpy())
-                    indices = [(-score, idx) for idx, score in enumerate(scores)]
-                    heapq.heapify(indices)
-                
-                second_rerank_end_time = time.time()
-                print(f"Second re-ranking took {second_rerank_end_time - second_rerank_start_time:.2f} seconds.")
-
-                # Select top 3 results
-                topk = []
-                references = []
-                for _ in range(min(5, len(indices))):
-                    score, idx = heapq.heappop(indices)
-                    docid, content, _ = top20_docs[idx]
-                    reference = {"score": float(-score), "content": content}
+                    reference = {"score": float(-score), "content": docs[idx]['content']}
                     topk.append(docid)
                     references.append(reference)
                 
                 # Update response with re-ranked results
                 response = {
                     "eval_id": row.get("eval_id"),
-                    "standalone_query": standalone_query,
+                    "standalone_query": multi_query,
                     "topk": topk,
                     "references": references
                 }
-                #updated_results.append(response)
+                updated_results.append(response)
                 
 
                 #3-1 LLM call               
