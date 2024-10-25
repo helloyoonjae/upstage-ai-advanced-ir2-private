@@ -1,14 +1,11 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/Tm6AYAOm)
-# Title (Please modify the title)
-## Team
+# 과학 지식 질의 응답 시스템 구축
+## 정보 검색 2팀 - 전지재능
 
 | ![박패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![이패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![최패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![김패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![오패캠](https://avatars.githubusercontent.com/u/156163982?v=4) |
 | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: |
 |            [이윤재](https://github.com/UpstageAILab)             |            [장은지](https://github.com/UpstageAILab)             |            [이재명](https://github.com/UpstageAILab)             |            [전백찬](https://github.com/UpstageAILab)             |            [최지](https://github.com/UpstageAILab)             |
 |                          엘라스틱서치, 리랭크, 모델학습                            |                            콜버트, 임베딩                             |                            콜버트, 크로스인코더                            |                            청킹, 페이스                             |                            전처리, 프롬프트 엔지니어링                            |
-# 과학 지식 질의 응답 시스템 구축
-
-정보 검색 2팀 - 전지재능
 
 ---
 
