@@ -1,13 +1,8 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/Tm6AYAOm)
-# 과학 지식 질의 응답 시스템 구축
-## 정보 검색 2팀 - 전지재능
+# Scientific Knowledge Question Answering | 과학 지식 질의 응답 시스템 구축
+- Upstage AI Stages https://stages.ai/en/competitions/322
 
-| ![박패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![이패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![최패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![김패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![오패캠](https://avatars.githubusercontent.com/u/156163982?v=4) |
-| :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: |
-|            [이윤재](https://github.com/UpstageAILab)             |            [장은지](https://github.com/UpstageAILab)             |            [이재명](https://github.com/UpstageAILab)             |            [전백찬](https://github.com/UpstageAILab)             |            [최지](https://github.com/UpstageAILab)             |
-|                          엘라스틱서치, 리랭크학습                            |                            콜버트, 임베딩                             |                            콜버트, 크로스인코더                            |                            청킹, 페이스                             |                            전처리, 프롬프트 엔지니어링                            |
-
----
+## Team
+![](https://github.com/UpstageAILab3/upstage-ai-advanced-ir2-private/blob/main/docs/images/image0.png)
 
 ## 0. Overview
 
@@ -68,28 +63,6 @@
 ---
 
 ## 2. Components
-
-### Directory
-
-```
-├── code
-│   ├── jupyter_notebooks
-│   │   ├── 03.Meta-Llama-3.1-8B.ipynb
-│   │   ├── Model_Solar.ipynb
-│   │   ├── ko-gemma-2-9B-summarize.ipynb
-│   │   ├── preprocessor.ipynb
-│   │   └── t5.ipynb
-│   └── train.py
-├── docs
-│   ├── pdf
-│   │   ├── [패스트캠퍼스] Upstage AI Lab 3기_NLP_경진대회_발표자료_11조.pdf
-│   │   └── [패스트캠퍼스] Upstage AI Lab 3기_NLP_경진대회_현황공유판_11조.xlsx
-│   └── paper
-└── input
-    └── data
-        ├── eval
-        └── train
-```
 
 ---
 
@@ -178,13 +151,6 @@
 
 ### Model Description
 
-- **사용된 주요 사전 학습 모델**:
-  - `digit82/kobart-summarization`
-  - `eenzeenee/t5-base-korean-summarization`
-  - `meta-llama/Meta-Llama-3.1-8B`
-  - `upstage/SOLAR-10.7B-v1.0`
-  - `rtzr/ko-gemma-2-9b-it`
-
 - **임베딩 모델**:
   - `SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")`
   - `OpenAI text-embedding-ada-002`
@@ -232,34 +198,18 @@
 ## 5. Result
 
 ### Leader Board
-
-- **Private 리더보드**:
-  - **최종 MAP 점수**: **0.926**
-  - **순위**: **1위**
-
-- **Public 리더보드**:
-  - **최종 MAP 점수**: **0.84**
-  - **순위**: **3위**
+  - Midterm MAP:0.9288, MRR:0.9348 - 3위
+  - Midterm MAP:0.9189	MRR:0.9197 - 1위
 
 ### Presentation
+- [패스트캠퍼스_Upstage_AI_Lab_3기_AI_실전학습_경진대회_발표자료_IR_2조.pdf](/docs/패스트캠퍼스_Upstage_AI_Lab_3기_AI_실전학습_경진대회_발표자료_IR_2조.pdf)
 
-- **발표 자료**: [Upstage AI Lab 3기 NLP 경진대회 발표자료](#) *(실제 PDF 파일 링크를 삽입해주세요)*
+### Meeting Log
+- [패스트캠퍼스_Upstage_AI_Lab_3기_AI_실전학습_경진대회_미팅로그_IR_2조.xlsx](/docs/패스트캠퍼스_Upstage_AI_Lab_3기_AI_실전학습_경진대회_미팅로그_IR_2조.xlsx)
 
 ---
 
-## etc
-
-### Meeting Log
-
-- **미팅 일정**: 매일 오전 11시
-- **협업 도구**:
-  - **GitHub**: 코드 공유
-  - **Google 스프레드시트**: 실험 기록
-  - **Google Docs**: 문서화 및 노트 공유
-  - **Zoom**: 온라인 미팅
-  - **Slack**: 실시간 소통
-
-### Reference
+## 6. Reference
 
 - **Elasticsearch 문서**: [Elasticsearch Reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 - **OpenAI API 문서**: [OpenAI API](https://platform.openai.com/docs/api-reference)
@@ -268,6 +218,3 @@
   - ColBERT: [ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction](https://arxiv.org/abs/2112.01488)
   - Cross-Encoder를 활용한 재순위화 모델
 
----
-
-감사합니다.
