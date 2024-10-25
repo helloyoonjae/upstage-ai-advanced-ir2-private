@@ -5,7 +5,7 @@
 | ![박패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![이패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![최패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![김패캠](https://avatars.githubusercontent.com/u/156163982?v=4) | ![오패캠](https://avatars.githubusercontent.com/u/156163982?v=4) |
 | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: |
 |            [이윤재](https://github.com/UpstageAILab)             |            [장은지](https://github.com/UpstageAILab)             |            [이재명](https://github.com/UpstageAILab)             |            [전백찬](https://github.com/UpstageAILab)             |            [최지](https://github.com/UpstageAILab)             |
-|                          엘라스틱서치, 리랭크, 모델학습                            |                            콜버트, 임베딩                             |                            콜버트, 크로스인코더                            |                            청킹, 페이스                             |                            전처리, 프롬프트 엔지니어링                            |
+|                          엘라스틱서치, 리랭크학습                            |                            콜버트, 임베딩                             |                            콜버트, 크로스인코더                            |                            청킹, 페이스                             |                            전처리, 프롬프트 엔지니어링                            |
 
 ---
 
