@@ -199,7 +199,7 @@
 
 ### Leader Board
   - Midterm MAP:0.9288, MRR:0.9348 - 3위
-  - Midterm MAP:0.9189	MRR:0.9197 - 1위
+  - Final MAP:0.9189	MRR:0.9197 - 1위
 
 ### Presentation
 - [패스트캠퍼스_Upstage_AI_Lab_3기_AI_실전학습_경진대회_발표자료_IR_2조.pdf](/docs/패스트캠퍼스_Upstage_AI_Lab_3기_AI_실전학습_경진대회_발표자료_IR_2조.pdf)
